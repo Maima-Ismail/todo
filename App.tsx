@@ -6,7 +6,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store, persistor } from './src/store';
 import { lightTheme } from './src/utils/theme';
-import HomeScreen from './src/screens/HomeScreen';
+import { RootNavigator } from './src/navigation';
 
 function App(): React.JSX.Element {
   return (
@@ -15,7 +15,7 @@ function App(): React.JSX.Element {
         <PaperProvider theme={lightTheme}>
           <SafeAreaProvider>
             <StatusBar barStyle="light-content" backgroundColor="#6366f1" />
-            <HomeScreen />
+            <RootNavigator />
           </SafeAreaProvider>
         </PaperProvider>
       </PersistGate>

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { get, ENDPOINTS } from '../api';
 import { Todo, SortOption, FilterState } from '../types';
 
 interface TodosState {
@@ -23,7 +23,7 @@ export const fetchTodosFromAPI = createAsyncThunk(
   'todos/fetchFromAPI',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('https://jsonplaceholder.typicode.com/todos');
+      const response = await get(ENDPOINTS.TODOS.BASE);
       // Transform API data to match our Todo interface
       const transformedTodos = response.data.map((item: any, index: number) => {
         // Create realistic due dates (spread over next 30 days)
@@ -50,7 +50,6 @@ export const fetchTodosFromAPI = createAsyncThunk(
     } catch (error: any) {
       // Return error message for better error handling
       return rejectWithValue(
-        error.response?.data?.message || 
         error.message || 
         'Failed to fetch todos from API'
       );
