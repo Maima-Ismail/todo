@@ -2,11 +2,7 @@ module.exports = {
   presets: ["module:@react-native/babel-preset"],
   plugins: [
     "@babel/plugin-transform-export-namespace-from",
-    "react-native-reanimated/plugin",
+    "react-native-paper/babel",
+    "react-native-reanimated/plugin", // This must be last
   ],
-  env: {
-    production: {
-      plugins: ["react-native-paper/babel"],
-    },
-  },
 };
