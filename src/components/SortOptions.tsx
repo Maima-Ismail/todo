@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
     borderColor: '#cbd5e1',
   },
   chipSelected: {
-    backgroundColor: '#6366f1',
-    borderColor: '#6366f1',
+    backgroundColor: '#6e1e96',
+    borderColor: '#6e1e96',
   },
   chipText: {
     fontSize: 12,

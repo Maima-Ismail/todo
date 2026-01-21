@@ -43,7 +43,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
             <Checkbox
               status={todo.completed ? 'checked' : 'unchecked'}
               onPress={handleToggle}
-              color="#6366f1"
+              color="#6e1e96"
             />
             <TouchableOpacity
               style={styles.contentContainer}
@@ -65,7 +65,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
           <View style={styles.actions}>
             <IconButton
               icon="pencil"
-              iconColor="#6366f1"
+              iconColor="#6e1e96"
               size={20}
               onPress={handleEdit}
             />
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   },
   dateChip: {
     backgroundColor: '#e0e7ff',
-    borderColor: '#6366f1',
+    borderColor: '#6e1e96',
   },
   timeChip: {
     backgroundColor: '#f3e8ff',
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: 11,
-    color: '#6366f1',
+    color: '#6e1e96',
   },
   overdueChip: {
     backgroundColor: '#fee2e2',

@@ -1,84 +1,69 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Searchbar, Chip, Menu, Button } from 'react-native-paper';
+import { Searchbar, IconButton } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { setFilter, clearFilter, selectFilter } from '../slices/todosSlice';
-import { FilterType } from '../types';
+import { setNameFilter, selectFilter, selectSortOption } from '../slices/todosSlice';
 
-const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  onFilterPress: () => void;
+  onSortPress: () => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onFilterPress, onSortPress }) => {
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
-  const [searchQuery, setSearchQuery] = useState(filter.value);
-  const [filterMenuVisible, setFilterMenuVisible] = useState(false);
+  const sortOption = useSelector(selectSortOption);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    if (query.trim()) {
-      dispatch(setFilter({ type: filter.type !== 'none' ? filter.type : 'name', value: query }));
-    } else {
-      dispatch(clearFilter());
-    }
-  };
-
-  const handleFilterTypeChange = (type: FilterType) => {
-    setFilterMenuVisible(false);
-    if (searchQuery.trim()) {
-      dispatch(setFilter({ type, value: searchQuery }));
-    } else {
-      dispatch(setFilter({ type, value: '' }));
-    }
+    // Search by name or description on the filtered list
+    dispatch(setNameFilter(query.trim()));
   };
 
   const handleClear = () => {
     setSearchQuery('');
-    dispatch(clearFilter());
+    dispatch(setNameFilter(''));
   };
+
+  const hasActiveFilter = filter.dateTimeFilter !== undefined;
+  const hasActiveSort = sortOption !== 'none';
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
+      <View style={styles.searchRow}>
         <Searchbar
-          placeholder="Search todos..."
+          placeholder="Search by name or description..."
           onChangeText={handleSearch}
           value={searchQuery}
           style={styles.searchbar}
           inputStyle={styles.searchInput}
-          iconColor="#6366f1"
+          iconColor="#6e1e96"
           onClearIconPress={handleClear}
         />
-        <Menu
-          visible={filterMenuVisible}
-          onDismiss={() => setFilterMenuVisible(false)}
-          anchor={
-            <Button
-              mode="outlined"
-              onPress={() => setFilterMenuVisible(true)}
-              style={styles.filterButton}
-              icon="filter"
-              contentStyle={styles.filterButtonContent}
-            >
-              {filter.type !== 'none' ? filter.type : 'Filter'}
-            </Button>
-          }
-        >
-          <Menu.Item onPress={() => handleFilterTypeChange('name')} title="By Name" />
-          <Menu.Item onPress={() => handleFilterTypeChange('date')} title="By Date" />
-          <Menu.Item onPress={() => handleFilterTypeChange('time')} title="By Time" />
-          <Menu.Item onPress={() => handleFilterTypeChange('none')} title="None" />
-        </Menu>
-      </View>
-      {filter.type !== 'none' && filter.value && (
-        <View style={styles.chipContainer}>
-          <Chip
-            icon="close"
-            onClose={handleClear}
-            style={styles.chip}
-            textStyle={styles.chipText}
-          >
-            {filter.type}: {filter.value}
-          </Chip>
+        <View style={styles.actionButtons}>
+          <IconButton
+            icon="filter"
+            iconColor={hasActiveFilter ? '#6e1e96' : '#64748b'}
+            size={24}
+            onPress={onFilterPress}
+            style={[
+              styles.actionButton,
+              hasActiveFilter && styles.actionButtonActive,
+            ]}
+          />
+          <IconButton
+            icon="sort"
+            iconColor={hasActiveSort ? '#6e1e96' : '#64748b'}
+            size={24}
+            onPress={onSortPress}
+            style={[
+              styles.actionButton,
+              hasActiveSort && styles.actionButtonActive,
+            ]}
+          />
         </View>
-      )}
+      </View>
     </View>
   );
 };
@@ -87,35 +72,32 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
   },
-  searchContainer: {
+  searchRow: {
     flexDirection: 'row',
-    gap: 8,
     alignItems: 'center',
+    gap: 8,
   },
   searchbar: {
     flex: 1,
-    elevation: 2,
+    elevation: 0,
     backgroundColor: '#f8fafc',
+    borderRadius: 12,
   },
   searchInput: {
     fontSize: 14,
   },
-  filterButton: {
-    borderColor: '#6366f1',
-  },
-  filterButtonContent: {
+  actionButtons: {
     flexDirection: 'row',
+    gap: 4,
   },
-  chipContainer: {
-    marginTop: 8,
+  actionButton: {
+    margin: 0,
   },
-  chip: {
-    backgroundColor: '#e0e7ff',
-    alignSelf: 'flex-start',
-  },
-  chipText: {
-    color: '#6366f1',
+  actionButtonActive: {
+    backgroundColor: '#f3e8ff',
   },
 });
 

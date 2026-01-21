@@ -19,7 +19,7 @@ const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromA
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#6e1e96" />
         <Text style={styles.loadingText}>Loading todos...</Text>
       </View>
     );
@@ -41,7 +41,7 @@ const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromA
               onPress={onFetchFromAPI}
               icon="download"
               style={styles.fetchButton}
-              buttonColor="#6366f1"
+              buttonColor="#6e1e96"
             >
               Fetch from API
             </Button>
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#6e1e96',
   },
 });
 

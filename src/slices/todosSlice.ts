@@ -15,7 +15,7 @@ const initialState: TodosState = {
   loading: false,
   error: null,
   sortOption: 'none',
-  filter: { type: 'none', value: '' },
+  filter: { type: 'none', value: '', dateTimeFilter: undefined, nameFilter: undefined },
 };
 
 // Async thunk for fetching todos from API
@@ -91,7 +91,43 @@ const todosSlice = createSlice({
       state.filter = action.payload;
     },
     clearFilter: (state) => {
-      state.filter = { type: 'none', value: '' };
+      state.filter = { type: 'none', value: '', dateTimeFilter: undefined, nameFilter: undefined };
+    },
+    setDateTimeFilter: (state, action: PayloadAction<{ type: 'date' | 'time'; value: string }>) => {
+      if (action.payload.value) {
+        state.filter.dateTimeFilter = action.payload;
+        // Update main filter type for backward compatibility
+        if (state.filter.nameFilter) {
+          state.filter.type = 'name';
+          state.filter.value = state.filter.nameFilter;
+        } else {
+          state.filter.type = action.payload.type;
+          state.filter.value = action.payload.value;
+        }
+      } else {
+        // Clear date/time filter
+        state.filter.dateTimeFilter = undefined;
+        if (state.filter.nameFilter) {
+          state.filter.type = 'name';
+          state.filter.value = state.filter.nameFilter;
+        } else {
+          state.filter.type = 'none';
+          state.filter.value = '';
+        }
+      }
+    },
+    setNameFilter: (state, action: PayloadAction<string>) => {
+      state.filter.nameFilter = action.payload;
+      if (action.payload) {
+        state.filter.type = 'name';
+        state.filter.value = action.payload;
+      } else if (state.filter.dateTimeFilter) {
+        state.filter.type = state.filter.dateTimeFilter.type;
+        state.filter.value = state.filter.dateTimeFilter.value;
+      } else {
+        state.filter.type = 'none';
+        state.filter.value = '';
+      }
     },
   },
   extraReducers: (builder) => {
@@ -131,6 +167,8 @@ export const {
   setSortOption,
   setFilter,
   clearFilter,
+  setDateTimeFilter,
+  setNameFilter,
 } = todosSlice.actions;
 
 // Selectors
@@ -145,20 +183,38 @@ export const selectFilteredAndSortedTodos = (state: { todos: TodosState }): Todo
   const { todos, sortOption, filter } = state.todos;
   let filteredTodos = [...todos];
 
-  // Apply filter
-  if (filter.type !== 'none' && filter.value) {
+  // First apply date/time filters (if any)
+  const dateTimeFilter = filter.dateTimeFilter || 
+    (filter.type === 'date' || filter.type === 'time' 
+      ? { type: filter.type as 'date' | 'time', value: filter.value }
+      : undefined);
+  const nameFilter = filter.nameFilter || 
+    (filter.type === 'name' ? filter.value : undefined);
+
+  // Apply date/time filter first
+  if (dateTimeFilter && dateTimeFilter.value) {
     filteredTodos = filteredTodos.filter(todo => {
-      switch (filter.type) {
-        case 'name':
-          return todo.name.toLowerCase().includes(filter.value.toLowerCase()) ||
-                 todo.description.toLowerCase().includes(filter.value.toLowerCase());
+      switch (dateTimeFilter.type) {
         case 'date':
-          return todo.dueDate === filter.value;
+          // Handle date range (format: "YYYY-MM-DD to YYYY-MM-DD") or single date
+          if (dateTimeFilter.value.includes(' to ')) {
+            const [startDate, endDate] = dateTimeFilter.value.split(' to ');
+            return todo.dueDate >= startDate && todo.dueDate <= endDate;
+          }
+          return todo.dueDate === dateTimeFilter.value;
         case 'time':
-          return todo.dueTime.includes(filter.value);
+          return todo.dueTime.includes(dateTimeFilter.value);
         default:
           return true;
       }
+    });
+  }
+
+  // Then apply name/description search on the filtered list
+  if (nameFilter) {
+    filteredTodos = filteredTodos.filter(todo => {
+      return todo.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
+             todo.description.toLowerCase().includes(nameFilter.toLowerCase());
     });
   }
 

@@ -15,4 +15,7 @@ export type FilterType = 'name' | 'date' | 'time' | 'none';
 export interface FilterState {
   type: FilterType;
   value: string;
+  // Support for multiple filters: date/time filter + name search
+  dateTimeFilter?: { type: 'date' | 'time'; value: string };
+  nameFilter?: string;
 }

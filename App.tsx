@@ -14,7 +14,7 @@ function App(): React.JSX.Element {
       <PersistGate loading={null} persistor={persistor}>
         <PaperProvider theme={lightTheme}>
           <SafeAreaProvider>
-            <StatusBar barStyle="light-content" backgroundColor="#6366f1" />
+            <StatusBar barStyle="light-content" backgroundColor="#6e1e96" translucent={false} />
             <RootNavigator />
           </SafeAreaProvider>
         </PaperProvider>

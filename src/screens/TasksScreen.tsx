@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Appbar, Button, Menu, Portal, Snackbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
-import SortOptions from '../components/SortOptions';
+import ActiveFilters from '../components/ActiveFilters';
+import FilterByDateSheet from '../components/FilterByDateSheet';
+import FilterByTimeSheet from '../components/FilterByTimeSheet';
+import SortBySheet from '../components/SortBySheet';
 import TodoList from '../components/TodoList';
 import TodoForm from '../components/TodoForm';
 import { fetchTodosFromAPI, addTodo, updateTodo, selectError, selectLoading, selectAllTodos } from '../slices/todosSlice';
@@ -23,6 +26,9 @@ const TasksScreen: React.FC = () => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
+  const [filterDateSheetVisible, setFilterDateSheetVisible] = useState(false);
+  const [filterTimeSheetVisible, setFilterTimeSheetVisible] = useState(false);
+  const [sortSheetVisible, setSortSheetVisible] = useState(false);
 
   const handleAddTodo = () => {
     setEditingTodo(null);
@@ -99,8 +105,14 @@ const TasksScreen: React.FC = () => {
       </Appbar.Header>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <SearchBar />
-        <SortOptions />
+        <SearchBar 
+          onFilterPress={() => {
+            // Open date filter sheet
+            setFilterDateSheetVisible(true);
+          }}
+          onSortPress={() => setSortSheetVisible(true)}
+        />
+        <ActiveFilters />
 
         {error && (
           <View style={styles.errorContainer}>
@@ -145,6 +157,27 @@ const TasksScreen: React.FC = () => {
         onSubmit={handleSubmitTodo}
       />
 
+      <FilterByDateSheet
+        visible={filterDateSheetVisible}
+        onDismiss={() => setFilterDateSheetVisible(false)}
+        onSwitchToTime={() => {
+          setFilterDateSheetVisible(false);
+          setFilterTimeSheetVisible(true);
+        }}
+      />
+      <FilterByTimeSheet
+        visible={filterTimeSheetVisible}
+        onDismiss={() => setFilterTimeSheetVisible(false)}
+        onSwitchToDate={() => {
+          setFilterTimeSheetVisible(false);
+          setFilterDateSheetVisible(true);
+        }}
+      />
+      <SortBySheet
+        visible={sortSheetVisible}
+        onDismiss={() => setSortSheetVisible(false)}
+      />
+
       <Portal>
         <Snackbar
           visible={snackbarVisible}
@@ -169,7 +202,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   header: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#6e1e96',
   },
   title: {
     fontWeight: '700',
@@ -195,7 +228,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     borderRadius: 12,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#6e1e96',
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

@@ -17,9 +17,10 @@ const BottomTabNavigator: React.FC = () => {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#e2e8f0',
-          height: 60,
-          paddingBottom: 8,
+          height: 80,
+          paddingBottom: 12,
           paddingTop: 8,
+          paddingHorizontal: 8,
         },
         headerShown: false,
       }}

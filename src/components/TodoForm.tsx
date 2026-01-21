@@ -229,11 +229,11 @@ const styles = StyleSheet.create({
   },
   dateButton: {
     flex: 1,
-    borderColor: '#6366f1',
+    borderColor: '#6e1e96',
   },
   timeButton: {
     flex: 1,
-    borderColor: '#6366f1',
+    borderColor: '#6e1e96',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     borderColor: '#cbd5e1',
   },
   submitButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#6e1e96',
   },
 });
 
