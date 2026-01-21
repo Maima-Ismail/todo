@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { lightTheme } from '../utils/theme';
 import { Colors, Spacing, FontSizes } from '../utils/constants';
 
 interface HeaderProps {

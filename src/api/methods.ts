@@ -2,27 +2,20 @@ import { AxiosResponse } from 'axios';
 import { apiClient } from './apiClient';
 import { ENDPOINTS } from './endpoints';
 
-/**
- * Generic API response type
- */
+
 export interface ApiResponse<T = any> {
   data: T;
   status: number;
   message?: string;
 }
 
-/**
- * Generic error response type
- */
 export interface ApiError {
   message: string;
   status?: number;
   data?: any;
 }
 
-/**
- * GET request
- */
+
 export const get = async <T = any>(
   endpoint: string,
   config?: any
@@ -42,9 +35,6 @@ export const get = async <T = any>(
   }
 };
 
-/**
- * POST request
- */
 export const post = async <T = any>(
   endpoint: string,
   data?: any,
@@ -65,9 +55,6 @@ export const post = async <T = any>(
   }
 };
 
-/**
- * PUT request
- */
 export const put = async <T = any>(
   endpoint: string,
   data?: any,
@@ -88,9 +75,6 @@ export const put = async <T = any>(
   }
 };
 
-/**
- * PATCH request
- */
 export const patch = async <T = any>(
   endpoint: string,
   data?: any,
@@ -111,9 +95,6 @@ export const patch = async <T = any>(
   }
 };
 
-/**
- * DELETE request
- */
 export const del = async <T = any>(
   endpoint: string,
   config?: any
@@ -133,9 +114,6 @@ export const del = async <T = any>(
   }
 };
 
-/**
- * Export all HTTP methods
- */
 export const apiMethods = {
   get,
   post,
@@ -144,7 +122,4 @@ export const apiMethods = {
   delete: del,
 };
 
-/**
- * Export endpoints for convenience
- */
 export { ENDPOINTS };

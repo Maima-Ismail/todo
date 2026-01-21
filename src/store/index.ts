@@ -6,7 +6,7 @@ import todosReducer from '../slices/todosSlice';
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['todos'], // Only persist the todos slice
+  whitelist: ['todos'],
 };
 
 const rootReducer = combineReducers({

@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { selectFilteredAndSortedTodos, selectLoading } from '../slices/todosSlice';
 import TodoItem from './TodoItem';
 import { Todo } from '../types';
-import { Colors, Spacing, FontSizes } from '../utils/constants';
+import { Colors, Spacing } from '../utils/constants';
 
 interface TodoListProps {
   onEditTodo: (todo: Todo) => void;
@@ -24,7 +24,6 @@ const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromA
   const displayedTodos = todos.slice(0, displayCount);
   const hasMore = todos.length > displayCount;
 
-  // Reset pagination when todos list changes
   useEffect(() => {
     setDisplayCount(ITEMS_PER_PAGE);
   }, [todos.length]);

@@ -32,7 +32,6 @@ const ActiveFilters: React.FC = () => {
   const getFilterLabel = () => {
     if (filter.dateTimeFilter) {
       const value = filter.dateTimeFilter.value;
-      // Handle old range format for backward compatibility
       const displayValue = value.includes(' to ') ? value.split(' to ')[0] : value;
       return `${filter.dateTimeFilter.type}: ${displayValue}`;
     }
@@ -47,7 +46,6 @@ const ActiveFilters: React.FC = () => {
           <Chip
             icon="filter"
             onClose={() => {
-              // Clear date/time filter, keep name filter if exists
               if (filter.dateTimeFilter) {
                 dispatch(setDateTimeFilter({ type: filter.dateTimeFilter.type, value: '' }));
               } else {

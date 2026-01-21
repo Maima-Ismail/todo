@@ -18,17 +18,14 @@ const FilterByTimeSheet: React.FC<FilterByTimeSheetProps> = ({ visible, onDismis
   const [selectedTime, setSelectedTime] = useState<Date>(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // Initialize with existing filter if present, or default to current time
   useEffect(() => {
     if (visible) {
       if (filter.dateTimeFilter && filter.dateTimeFilter.type === 'time' && filter.dateTimeFilter.value) {
-        // Parse time value (format: "HH:MM")
         const [hours, minutes] = filter.dateTimeFilter.value.split(':');
         const time = new Date();
         time.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
         setSelectedTime(time);
       } else {
-        // Default to current time
         setSelectedTime(new Date());
       }
       setShowTimePicker(false);

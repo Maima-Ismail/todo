@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import {
   Modal,
-  Portal,
   TextInput,
   Button,
   Text,

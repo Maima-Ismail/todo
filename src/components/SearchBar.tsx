@@ -21,7 +21,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFilterPress, onSortPress }) => 
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // Search by name or description on the filtered list
     dispatch(setNameFilter(query.trim()));
   };
 

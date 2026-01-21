@@ -18,19 +18,15 @@ const initialState: TodosState = {
   filter: { type: 'none', value: '', dateTimeFilter: undefined, nameFilter: undefined },
 };
 
-// Async thunk for fetching todos from API
 export const fetchTodosFromAPI = createAsyncThunk(
   'todos/fetchFromAPI',
   async (_, { rejectWithValue }) => {
     try {
       const response = await get(ENDPOINTS.TODOS.BASE);
-      // Transform API data to match our Todo interface
       const transformedTodos = response.data.map((item: any, index: number) => {
-        // Create realistic due dates (spread over next 30 days)
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + (index % 30));
         
-        // Create realistic times (9 AM to 9 PM)
         const hour = 9 + (index % 12);
         const minute = (index * 5) % 60;
         
@@ -48,7 +44,6 @@ export const fetchTodosFromAPI = createAsyncThunk(
       });
       return transformedTodos;
     } catch (error: any) {
-      // Return error message for better error handling
       return rejectWithValue(
         error.message || 
         'Failed to fetch todos from API'
@@ -67,7 +62,6 @@ const todosSlice = createSlice({
         id: `todo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString(),
       };
-      // Add new todos at the top
       state.todos.unshift(newTodo);
     },
     updateTodo: (state, action: PayloadAction<Todo>) => {
@@ -97,7 +91,6 @@ const todosSlice = createSlice({
     setDateTimeFilter: (state, action: PayloadAction<{ type: 'date' | 'time'; value: string }>) => {
       if (action.payload.value) {
         state.filter.dateTimeFilter = action.payload;
-        // Update main filter type for backward compatibility
         if (state.filter.nameFilter) {
           state.filter.type = 'name';
           state.filter.value = state.filter.nameFilter;
@@ -106,7 +99,6 @@ const todosSlice = createSlice({
           state.filter.value = action.payload.value;
         }
       } else {
-        // Clear date/time filter
         state.filter.dateTimeFilter = undefined;
         if (state.filter.nameFilter) {
           state.filter.type = 'name';
@@ -139,7 +131,6 @@ const todosSlice = createSlice({
       })
       .addCase(fetchTodosFromAPI.fulfilled, (state, action) => {
         state.loading = false;
-        // Filter out duplicates (todos with same API id already exist)
         const existingApiIds = new Set(
           state.todos
             .filter(todo => todo.id.startsWith('api-'))
@@ -148,7 +139,6 @@ const todosSlice = createSlice({
         const newTodos = action.payload.filter(
           todo => !existingApiIds.has(todo.id.replace('api-', ''))
         );
-        // Append only new API todos to existing todos
         state.todos = [...state.todos, ...newTodos];
       })
       .addCase(fetchTodosFromAPI.rejected, (state, action) => {
@@ -179,12 +169,10 @@ export const selectFilter = (state: { todos: TodosState }) => state.todos.filter
 export const selectLoading = (state: { todos: TodosState }) => state.todos.loading;
 export const selectError = (state: { todos: TodosState }) => state.todos.error;
 
-// Helper function to get filtered and sorted todos
 export const selectFilteredAndSortedTodos = (state: { todos: TodosState }): Todo[] => {
   const { todos, sortOption, filter } = state.todos;
   let filteredTodos = [...todos];
 
-  // First apply date/time filters (if any)
   const dateTimeFilter = filter.dateTimeFilter || 
     (filter.type === 'date' || filter.type === 'time' 
       ? { type: filter.type as 'date' | 'time', value: filter.value }
@@ -192,12 +180,10 @@ export const selectFilteredAndSortedTodos = (state: { todos: TodosState }): Todo
   const nameFilter = filter.nameFilter || 
     (filter.type === 'name' ? filter.value : undefined);
 
-  // Apply date/time filter first
   if (dateTimeFilter && dateTimeFilter.value) {
     filteredTodos = filteredTodos.filter(todo => {
       switch (dateTimeFilter.type) {
         case 'date':
-          // Single date filter
           return todo.dueDate === dateTimeFilter.value;
         case 'time':
           return todo.dueTime.includes(dateTimeFilter.value);
@@ -207,7 +193,6 @@ export const selectFilteredAndSortedTodos = (state: { todos: TodosState }): Todo
     });
   }
 
-  // Then apply name/description search on the filtered list
   if (nameFilter) {
     filteredTodos = filteredTodos.filter(todo => {
       return todo.name.toLowerCase().includes(nameFilter.toLowerCase()) ||

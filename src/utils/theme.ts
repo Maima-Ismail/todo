@@ -18,21 +18,3 @@ export const lightTheme = {
     onSurface: Colors.textPrimary,
   },
 };
-
-export const darkTheme = {
-  ...MD3DarkTheme,
-  colors: {
-    ...MD3DarkTheme.colors,
-    primary: Colors.primary,
-    secondary: Colors.secondary,
-    tertiary: Colors.tertiary,
-    background: '#0f172a',
-    surface: '#1e293b',
-    surfaceVariant: '#334155',
-    error: '#f87171',
-    onPrimary: Colors.textOnPrimary,
-    onSecondary: Colors.textOnPrimary,
-    onBackground: '#f1f5f9',
-    onSurface: '#f1f5f9',
-  },
-};

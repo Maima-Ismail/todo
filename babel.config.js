@@ -3,6 +3,6 @@ module.exports = {
   plugins: [
     "@babel/plugin-transform-export-namespace-from",
     "react-native-paper/babel",
-    "react-native-reanimated/plugin", // This must be last
+    "react-native-reanimated/plugin",
   ],
 };

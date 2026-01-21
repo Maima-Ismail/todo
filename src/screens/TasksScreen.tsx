@@ -18,14 +18,12 @@ import { fetchTodosFromAPI, addTodo, updateTodo, deleteTodo, selectError, select
 import { Todo } from '../types';
 
 const TasksScreen: React.FC = () => {
-  const navigation = useNavigation();
   const dispatch = useDispatch();
   const error = useSelector(selectError);
   const loading = useSelector(selectLoading);
   const allTodos = useSelector(selectAllTodos);
   const [formVisible, setFormVisible] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [menuVisible, setMenuVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
@@ -65,14 +63,7 @@ const TasksScreen: React.FC = () => {
     setDeleteSnackbarVisible(true);
   };
 
-  const handleEditTodoFromList = (todo: Todo) => {
-    handleEditTodo(todo);
-  };
-
   const handleFetchFromAPI = async () => {
-    setMenuVisible(false);
-    const countBefore = allTodos.length;
-    
     try {
       const result = await dispatch(fetchTodosFromAPI() as any);
       
@@ -106,7 +97,6 @@ const TasksScreen: React.FC = () => {
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <SearchBar 
             onFilterPress={() => {
-              // Open filter selection sheet first
               setFilterSelectionSheetVisible(true);
             }}
             onSortPress={() => setSortSheetVisible(true)}
