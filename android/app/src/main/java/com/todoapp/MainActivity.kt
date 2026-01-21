@@ -18,7 +18,7 @@ class MainActivity : ReactActivity() {
    * which allows you to enable New Architecture with a single boolean flag [fabricEnabled]
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
-      DefaultReactActivityDelegate(this, mainComponentName, false)  // Changed to false
+      DefaultReactActivityDelegate(this, mainComponentName, true)
 
   /**
    * Required for react-native-gesture-handler

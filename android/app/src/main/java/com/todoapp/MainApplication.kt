@@ -8,6 +8,8 @@ import com.facebook.react.ReactNativeHost
 import com.facebook.react.ReactPackage
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint
+import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
 
 class MainApplication : Application(), ReactApplication {
@@ -23,7 +25,7 @@ class MainApplication : Application(), ReactApplication {
 
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
-        override val isNewArchEnabled: Boolean = false  // Explicitly set to false
+        override val isNewArchEnabled: Boolean = true  // Enabled with NDK 25.1
         override val isHermesEnabled: Boolean = true
       }
 
@@ -32,7 +34,12 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
-    SoLoader.init(this, false)
-    // Remove the New Architecture loading code completely
+    // Initialize SoLoader with OpenSourceMergedSoMapping for proper native library loading
+    SoLoader.init(this, OpenSourceMergedSoMapping)
+    
+    // Load New Architecture native libraries if enabled
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      DefaultNewArchitectureEntryPoint.load()
+    }
   }
 }

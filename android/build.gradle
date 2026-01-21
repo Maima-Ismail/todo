@@ -2,19 +2,19 @@ buildscript {
     ext {
         googlePlayServicesVersion = "+"
         firebaseMessagingVersion = "21.1.0"
-        buildToolsVersion = "35.0.0"          
-        minSdkVersion = 24
+        buildToolsVersion = "35.0.0"
+        minSdkVersion = 28
         compileSdkVersion = 35
-        targetSdkVersion = 34
-        ndkVersion = "26.1.10909125"
-        kotlinVersion = "1.9.24"
+        targetSdkVersion = 35
+        ndkVersion = "29.0.14033849"
+        kotlinVersion = "2.1.20"
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.3")
+        classpath("com.android.tools.build:gradle:8.13.0")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath('com.google.gms:google-services:4.4.4')
