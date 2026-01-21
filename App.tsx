@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store, persistor } from './src/store';
 import { lightTheme } from './src/utils/theme';
 import { RootNavigator } from './src/navigation';
+import { Colors } from './src/utils/constants';
 
 function App(): React.JSX.Element {
   return (
@@ -14,7 +15,7 @@ function App(): React.JSX.Element {
       <PersistGate loading={null} persistor={persistor}>
         <PaperProvider theme={lightTheme}>
           <SafeAreaProvider>
-            <StatusBar barStyle="light-content" backgroundColor="#6e1e96" translucent={false} />
+            <StatusBar barStyle="light-content" backgroundColor={Colors.primary} translucent={false} />
             <RootNavigator />
           </SafeAreaProvider>
         </PaperProvider>

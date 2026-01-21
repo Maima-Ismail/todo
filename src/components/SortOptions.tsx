@@ -4,6 +4,7 @@ import { Chip, Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSortOption, selectSortOption } from '../slices/todosSlice';
 import { SortOption } from '../types';
+import { Colors, Spacing, FontSizes } from '../utils/constants';
 
 const SortOptions: React.FC = () => {
   const dispatch = useDispatch();
@@ -50,36 +51,36 @@ const SortOptions: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#ffffff',
+    padding: Spacing.md,
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#e2e8f0',
+    borderTopColor: Colors.border,
   },
   label: {
-    marginBottom: 8,
-    color: '#64748b',
+    marginBottom: Spacing.sm,
+    color: Colors.textSecondary,
     fontWeight: '600',
   },
   chipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: Spacing.sm,
   },
   chip: {
-    marginRight: 8,
-    marginBottom: 8,
-    borderColor: '#cbd5e1',
+    marginRight: Spacing.sm,
+    marginBottom: Spacing.sm,
+    borderColor: Colors.divider,
   },
   chipSelected: {
-    backgroundColor: '#6e1e96',
-    borderColor: '#6e1e96',
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   chipText: {
-    fontSize: 12,
-    color: '#64748b',
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   chipTextSelected: {
-    color: '#ffffff',
+    color: Colors.textOnPrimary,
     fontWeight: '600',
   },
 });

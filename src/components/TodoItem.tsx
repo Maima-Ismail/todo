@@ -1,16 +1,18 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Card, Checkbox, Text, IconButton, Chip } from 'react-native-paper';
+import { Card, Text, IconButton, Chip } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import { Todo } from '../types';
 import { toggleTodo, deleteTodo } from '../slices/todosSlice';
+import { Colors, Spacing, FontSizes, BorderRadius, ComponentSizes } from '../utils/constants';
 
 interface TodoItemProps {
   todo: Todo;
   onEdit: (todo: Todo) => void;
+  onDelete?: (todoId: string) => void;
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit, onDelete }) => {
   const dispatch = useDispatch();
 
   const handleToggle = () => {
@@ -18,21 +20,22 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
   };
 
   const handleDelete = () => {
-    dispatch(deleteTodo(todo.id));
+    if (onDelete) {
+      onDelete(todo.id);
+    } else {
+      dispatch(deleteTodo(todo.id));
+    }
   };
 
   const handleEdit = () => {
     onEdit(todo);
   };
 
-  const isOverdue = new Date(todo.dueDate) < new Date() && !todo.completed;
-
   return (
     <Card
       style={[
         styles.card,
         todo.completed && styles.cardCompleted,
-        isOverdue && !todo.completed && styles.cardOverdue,
       ]}
       mode="elevated"
       elevation={2}
@@ -40,11 +43,16 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
       <Card.Content>
         <View style={styles.header}>
           <View style={styles.checkboxContainer}>
-            <Checkbox
-              status={todo.completed ? 'checked' : 'unchecked'}
-              onPress={handleToggle}
-              color="#6e1e96"
-            />
+            <TouchableOpacity onPress={handleToggle} activeOpacity={0.7} style={styles.checkboxTouchable}>
+              <View style={[
+                styles.checkboxCircle,
+                todo.completed && styles.checkboxCircleCompleted,
+              ]}>
+                {todo.completed && (
+                  <Text style={styles.checkmark}>✓</Text>
+                )}
+              </View>
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.contentContainer}
               onPress={handleEdit}
@@ -65,15 +73,21 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
           <View style={styles.actions}>
             <IconButton
               icon="pencil"
-              iconColor="#6e1e96"
+              iconColor={Colors.primary}
               size={20}
               onPress={handleEdit}
+              style={{
+                margin: 0,
+              }}
             />
             <IconButton
               icon="delete"
-              iconColor="#ef4444"
+              iconColor={Colors.error}
               size={20}
               onPress={handleDelete}
+              style={{
+                margin: 0,
+              }}
             />
           </View>
         </View>
@@ -124,15 +138,6 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
               </Chip>
             )}
           </View>
-          {isOverdue && !todo.completed && (
-            <Chip
-              icon="alert"
-              style={styles.overdueChip}
-              textStyle={styles.overdueChipText}
-            >
-              Overdue
-            </Chip>
-          )}
         </View>
       </Card.Content>
     </Card>
@@ -141,91 +146,95 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit }) => {
 
 const styles = StyleSheet.create({
   card: {
-    marginHorizontal: 16,
-    marginVertical: 8,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    marginVertical: Spacing.sm,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
   },
   cardCompleted: {
-    opacity: 0.7,
-    backgroundColor: '#f1f5f9',
+    opacity: 0.8,
+    backgroundColor: Colors.surfaceVariant,
   },
-  cardOverdue: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#ef4444',
+  checkboxCircle: {
+    width: ComponentSizes.checkboxSize,
+    height: ComponentSizes.checkboxSize,
+    borderRadius: ComponentSizes.checkboxSize / 2,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.sm,
+  },
+  checkboxCircleCompleted: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  checkmark: {
+    color: Colors.textOnPrimary,
+    fontSize: FontSizes.lg,
+    fontWeight: 'bold',
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 8,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
+  checkboxTouchable: {
+    marginRight: Spacing.sm,
+  },
   contentContainer: {
     flex: 1,
-    marginLeft: 8,
   },
   title: {
     fontWeight: '600',
-    color: '#1e293b',
-    fontSize: 16,
+    color: Colors.textPrimary,
+    fontSize: FontSizes.lg,
   },
   titleCompleted: {
     textDecorationLine: 'line-through',
-    color: '#94a3b8',
+    color: Colors.textTertiary,
   },
   actions: {
     flexDirection: 'row',
   },
   description: {
-    color: '#64748b',
-    marginLeft: 40,
-    marginBottom: 12,
-    fontSize: 14,
+    color: Colors.textSecondary,
+    fontSize: FontSizes.md,
   },
   descriptionCompleted: {
-    color: '#94a3b8',
+    color: Colors.textTertiary,
   },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 8,
+    marginTop: Spacing.sm,
   },
   dateTimeContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.sm,
   },
   dateChip: {
     backgroundColor: '#e0e7ff',
-    borderColor: '#6e1e96',
+    borderColor: Colors.primary,
   },
   timeChip: {
-    backgroundColor: '#f3e8ff',
-    borderColor: '#8b5cf6',
+    backgroundColor: Colors.chipBackground,
+    borderColor: Colors.primaryLight,
   },
   chipText: {
-    fontSize: 11,
-    color: '#6e1e96',
-  },
-  overdueChip: {
-    backgroundColor: '#fee2e2',
-  },
-  overdueChipText: {
-    color: '#ef4444',
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: FontSizes.xs,
+    color: Colors.primary,
   },
   apiChip: {
     backgroundColor: '#dbeafe',
   },
   apiChipText: {
-    color: '#3b82f6',
-    fontSize: 10,
+    color: Colors.info,
+    fontSize: FontSizes.xs,
     fontWeight: '600',
   },
 });

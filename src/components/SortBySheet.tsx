@@ -5,6 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useDispatch, useSelector } from 'react-redux';
 import { setSortOption, selectSortOption } from '../slices/todosSlice';
 import { SortOption } from '../types';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../utils/constants';
 
 interface SortBySheetProps {
   visible: boolean;
@@ -73,7 +74,7 @@ const SortBySheet: React.FC<SortBySheetProps> = ({ visible, onDismiss }) => {
                   <MaterialCommunityIcons
                     name={option.icon}
                     size={20}
-                    color={isSelected ? '#6e1e96' : '#64748b'}
+                    color={isSelected ? Colors.primary : Colors.textSecondary}
                     style={styles.optionIcon}
                   />
                   <Text
@@ -90,7 +91,7 @@ const SortBySheet: React.FC<SortBySheetProps> = ({ visible, onDismiss }) => {
                   <MaterialCommunityIcons
                     name="check"
                     size={24}
-                    color="#6e1e96"
+                    color={Colors.primary}
                   />
                 )}
               </TouchableOpacity>
@@ -103,7 +104,7 @@ const SortBySheet: React.FC<SortBySheetProps> = ({ visible, onDismiss }) => {
             mode="outlined"
             onPress={handleReset}
             style={styles.resetButton}
-            textColor="#6e1e96"
+            textColor={Colors.primary}
           >
             Reset
           </Button>
@@ -111,7 +112,7 @@ const SortBySheet: React.FC<SortBySheetProps> = ({ visible, onDismiss }) => {
             mode="contained"
             onPress={handleDone}
             style={styles.doneButton}
-            buttonColor="#6e1e96"
+            buttonColor={Colors.primary}
             textColor="#ffffff"
           >
             Done
@@ -127,46 +128,46 @@ const SortBySheet: React.FC<SortBySheetProps> = ({ visible, onDismiss }) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.overlay,
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: BorderRadius.xxl,
+    borderTopRightRadius: BorderRadius.xxl,
     maxHeight: '70%',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: Colors.border,
   },
   title: {
     fontWeight: '700',
-    color: '#1e293b',
+    color: Colors.textPrimary,
   },
   closeButton: {
     margin: 0,
   },
   optionsContainer: {
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: Colors.surfaceVariant,
   },
   optionItemSelected: {
-    backgroundColor: '#f3e8ff',
+    backgroundColor: Colors.chipBackground,
   },
   optionContent: {
     flexDirection: 'row',
@@ -174,26 +175,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   optionIcon: {
-    marginRight: 12,
+    marginRight: Spacing.md,
   },
   optionText: {
-    color: '#64748b',
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   optionTextSelected: {
-    color: '#6e1e96',
+    color: Colors.primary,
     fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e2e8f0',
+    padding: Spacing.md,
+    gap: Spacing.md,
+    marginBottom: Spacing.lg,
   },
   resetButton: {
     flex: 1,
-    borderColor: '#cbd5e1',
+    borderColor: Colors.divider,
   },
   doneButton: {
     flex: 1,

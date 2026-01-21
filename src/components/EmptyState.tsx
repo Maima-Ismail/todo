@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { lightTheme } from '../utils/theme';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../utils/constants';
 
 interface EmptyStateProps {
   message?: string;
@@ -21,7 +22,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         <MaterialCommunityIcons 
           name="calendar-check" 
           size={64} 
-          color={lightTheme.colors.primary} 
+          color={Colors.primary} 
         />
       </View>
       <Text style={styles.message}>{message}</Text>
@@ -56,35 +57,35 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: Colors.surfaceVariant,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: Spacing.lg,
   },
   message: {
-    fontSize: 24,
+    fontSize: FontSizes.xxxl,
     fontWeight: '700',
-    color: '#1e293b',
+    color: Colors.textPrimary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#64748b',
+    fontSize: FontSizes.lg,
+    color: Colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 24,
+    marginBottom: Spacing.xl,
+    lineHeight: Spacing.lg,
   },
   button: {
-    borderRadius: 12,
-    backgroundColor: lightTheme.colors.primary,
+    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.primary,
   },
   buttonContent: {
-    paddingVertical: 8,
-    paddingHorizontal: 24,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
   },
   buttonLabel: {
-    fontSize: 16,
+    fontSize: FontSizes.lg,
     fontWeight: '600',
   },
 });

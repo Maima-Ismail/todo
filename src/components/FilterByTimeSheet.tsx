@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Platform, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Platform, Modal, TouchableOpacity } from 'react-native';
 import { Text, Button, IconButton, Portal } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from 'react-redux';
-import { setDateTimeFilter, clearFilter, selectFilter } from '../slices/todosSlice';
+import { setDateTimeFilter, selectFilter } from '../slices/todosSlice';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../utils/constants';
 
 interface FilterByTimeSheetProps {
   visible: boolean;
@@ -14,24 +15,30 @@ interface FilterByTimeSheetProps {
 const FilterByTimeSheet: React.FC<FilterByTimeSheetProps> = ({ visible, onDismiss, onSwitchToDate }) => {
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
-  const [selectedTime, setSelectedTime] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState<Date>(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  // Initialize with existing filter if present, or default to current time
+  useEffect(() => {
+    if (visible) {
+      if (filter.dateTimeFilter && filter.dateTimeFilter.type === 'time' && filter.dateTimeFilter.value) {
+        // Parse time value (format: "HH:MM")
+        const [hours, minutes] = filter.dateTimeFilter.value.split(':');
+        const time = new Date();
+        time.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+        setSelectedTime(time);
+      } else {
+        // Default to current time
+        setSelectedTime(new Date());
+      }
+      setShowTimePicker(false);
+    }
+  }, [visible, filter.dateTimeFilter]);
 
   const handleTimeChange = (event: any, date?: Date) => {
-    if (Platform.OS === 'android') {
-      if (date) {
-        setSelectedTime(date);
-      }
-    } else {
-      if (date) {
-        setSelectedTime(date);
-      }
+    if (date) {
+      setSelectedTime(date);
     }
-  };
-
-  const handleClear = () => {
-    setSelectedTime(new Date());
-    // Clear time filter, keep name filter if exists
-    dispatch(setDateTimeFilter({ type: 'time', value: '' }));
   };
 
   const handleApply = () => {
@@ -60,75 +67,88 @@ const FilterByTimeSheet: React.FC<FilterByTimeSheetProps> = ({ visible, onDismis
       >
         <View style={styles.modalOverlay}>
           <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <Text variant="headlineSmall" style={styles.title}>Time</Text>
-            <View style={styles.headerActions}>
-              {onSwitchToDate && (
-                <Button
-                  mode="text"
-                  onPress={onSwitchToDate}
-                  textColor="#6e1e96"
-                  icon="calendar"
-                  style={styles.switchButton}
+            <View style={styles.header}>
+              <Text variant="headlineSmall" style={styles.title}>Filter by Time</Text>
+              <IconButton
+                icon="close"
+                size={24}
+                onPress={onDismiss}
+                style={styles.closeButton}
+              />
+            </View>
+
+            <View style={styles.timePickerContainer}>
+              {!showTimePicker ? (
+                <TouchableOpacity
+                  style={styles.timeDisplayButton}
+                  onPress={() => {
+                    if (Platform.OS === 'android') {
+                      setShowTimePicker(true);
+                    } else {
+                      setShowTimePicker(true);
+                    }
+                  }}
                 >
-                  Date
-                </Button>
+                  <Text variant="titleLarge" style={styles.timeDisplayText}>
+                    {formatTime(selectedTime)}
+                  </Text>
+                  <Text variant="bodyMedium" style={styles.timeDisplayHint}>
+                    Tap to select time
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <>
+                  {Platform.OS === 'ios' ? (
+                    <View style={styles.pickerContainer}>
+                      <DateTimePicker
+                        value={selectedTime}
+                        mode="time"
+                        display="spinner"
+                        onChange={handleTimeChange}
+                        style={styles.iosPicker}
+                      />
+                      <View style={styles.pickerActions}>
+                        <Button
+                          mode="text"
+                          onPress={() => setShowTimePicker(false)}
+                          textColor={Colors.primary}
+                        >
+                          Done
+                        </Button>
+                      </View>
+                    </View>
+                  ) : (
+                    <DateTimePicker
+                      value={selectedTime}
+                      mode="time"
+                      display="default"
+                      onChange={(event, date) => {
+                        setShowTimePicker(false);
+                        if (event.type === 'set' && date) {
+                          setSelectedTime(date);
+                        } else if (event.type === 'dismissed') {
+                          setShowTimePicker(false);
+                        }
+                      }}
+                    />
+                  )}
+                </>
               )}
+            </View>
+
+            <View style={styles.footer}>
               <Button
-                mode="text"
-                onPress={handleClear}
-                textColor="#6e1e96"
-                style={styles.clearButton}
+                mode="contained"
+                onPress={handleApply}
+                style={styles.doneButton}
+                buttonColor={Colors.primary}
+                textColor={Colors.textOnPrimary}
+                disabled={!selectedTime}
               >
-                Clear
+                Apply Filter
               </Button>
             </View>
           </View>
-          <IconButton
-            icon="close"
-            size={24}
-            onPress={onDismiss}
-            style={styles.closeButton}
-          />
-        </View>
-
-        <View style={styles.timePickerContainer}>
-          <DateTimePicker
-            value={selectedTime}
-            mode="time"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={handleTimeChange}
-            style={styles.timePicker}
-            textColor="#1e293b"
-          />
-          {Platform.OS === 'ios' && (
-            <Text variant="bodyLarge" style={styles.timeDisplay}>
-              {formatTime(selectedTime)}
-            </Text>
-          )}
-        </View>
-
-        <View style={styles.footer}>
-          <Button
-            mode="outlined"
-            onPress={handleClear}
-            style={styles.resetButton}
-            textColor="#6e1e96"
-          >
-            Reset
-          </Button>
-          <Button
-            mode="contained"
-            onPress={handleApply}
-            style={styles.doneButton}
-            buttonColor="#6e1e96"
-            textColor="#ffffff"
-          >
-            Done
-          </Button>
-        </View>
-      </View>
         </View>
       </Modal>
     </Portal>
@@ -138,76 +158,77 @@ const FilterByTimeSheet: React.FC<FilterByTimeSheetProps> = ({ visible, onDismis
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.overlay,
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: '60%',
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: BorderRadius.xxl,
+    borderTopRightRadius: BorderRadius.xxl,
+    maxHeight: '70%',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flex: 1,
+    borderBottomColor: Colors.border,
   },
   title: {
     fontWeight: '700',
-    color: '#1e293b',
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  switchButton: {
-    marginRight: 8,
-  },
-  clearButton: {
-    marginLeft: 'auto',
+    color: Colors.textPrimary,
   },
   closeButton: {
     margin: 0,
   },
   timePickerContainer: {
-    padding: 24,
+    padding: Spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 200,
   },
-  timePicker: {
-    width: Platform.OS === 'ios' ? 200 : '100%',
+  timeDisplayButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.background,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    width: '100%',
   },
-  timeDisplay: {
-    marginTop: 16,
-    fontWeight: '600',
-    color: '#1e293b',
+  timeDisplayText: {
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
+  },
+  timeDisplayHint: {
+    color: Colors.textSecondary,
+  },
+  pickerContainer: {
+    marginTop: Spacing.sm,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.sm,
+    width: '100%',
+  },
+  iosPicker: {
+    width: '100%',
+    height: 200,
+  },
+  pickerActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: Spacing.sm,
   },
   footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e2e8f0',
-  },
-  resetButton: {
-    flex: 1,
-    borderColor: '#cbd5e1',
+    padding: Spacing.md,
+marginBottom: Spacing.lg,
   },
   doneButton: {
-    flex: 1,
+    width: '100%',
   },
 });
 

@@ -7,9 +7,11 @@ import {
   Button,
   Text,
   Divider,
+  HelperText,
 } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Todo } from '../types';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../utils/constants';
 
 interface TodoFormProps {
   visible: boolean;
@@ -31,6 +33,7 @@ const TodoForm: React.FC<TodoFormProps> = ({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [nameError, setNameError] = useState(false);
 
   useEffect(() => {
     if (todo) {
@@ -43,20 +46,24 @@ const TodoForm: React.FC<TodoFormProps> = ({
       timeDate.setMinutes(parseInt(minutes, 10));
       setDueTime(timeDate);
       setCompleted(todo.completed);
+      setNameError(false);
     } else {
       setName('');
       setDescription('');
       setDueDate(new Date());
       setDueTime(new Date());
       setCompleted(false);
+      setNameError(false);
     }
   }, [todo, visible]);
 
   const handleSubmit = () => {
     if (!name.trim()) {
+      setNameError(true);
       return;
     }
 
+    setNameError(false);
     const formattedDate = dueDate.toISOString().split('T')[0];
     const formattedTime = `${String(dueTime.getHours()).padStart(2, '0')}:${String(dueTime.getMinutes()).padStart(2, '0')}`;
 
@@ -88,13 +95,13 @@ const TodoForm: React.FC<TodoFormProps> = ({
   };
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        contentContainerStyle={styles.container}
-      >
-        <ScrollView>
+    <Modal
+      visible={visible}
+      onDismiss={onDismiss}
+      contentContainerStyle={styles.container}
+      style={styles.modal}
+    >
+        <View>
           <Text variant="headlineSmall" style={styles.title}>
             {todo ? 'Edit Todo' : 'Add New Todo'}
           </Text>
@@ -103,11 +110,20 @@ const TodoForm: React.FC<TodoFormProps> = ({
           <TextInput
             label="Todo Name *"
             value={name}
-            onChangeText={setName}
+            onChangeText={(text) => {
+              setName(text);
+              if (nameError && text.trim()) {
+                setNameError(false);
+              }
+            }}
             mode="outlined"
             style={styles.input}
             placeholder="Enter todo name"
+            error={nameError}
           />
+          <HelperText type="error" visible={nameError}>
+            Todo name is required
+          </HelperText>
 
           <TextInput
             label="Description"
@@ -190,63 +206,65 @@ const TodoForm: React.FC<TodoFormProps> = ({
             <Button
               mode="contained"
               onPress={handleSubmit}
-              style={styles.submitButton}
+              buttonColor={Colors.primary}
               disabled={!name.trim()}
             >
               {todo ? 'Update' : 'Add'}
             </Button>
           </View>
-        </ScrollView>
+        </View>
       </Modal>
-    </Portal>
   );
 };
 
 const styles = StyleSheet.create({
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
-    backgroundColor: '#ffffff',
-    padding: 24,
-    margin: 20,
-    borderRadius: 16,
-    maxHeight: '80%',
+    backgroundColor: Colors.surface,
+    padding: Spacing.lg,
+    margin: Spacing.md + 4,
+    borderRadius: BorderRadius.xl,
+    width: '90%',
   },
   title: {
     fontWeight: '700',
-    color: '#1e293b',
-    marginBottom: 8,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
   },
   divider: {
-    marginBottom: 20,
+    marginBottom: Spacing.md + 4,
   },
   input: {
-    marginBottom: 16,
-    backgroundColor: '#f8fafc',
+    marginBottom: Spacing.md,
+    backgroundColor: Colors.background,
   },
   dateTimeContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
+    gap: Spacing.md,
+    marginBottom: Spacing.lg,
   },
   dateButton: {
     flex: 1,
-    borderColor: '#6e1e96',
+    borderColor: Colors.primary,
   },
   timeButton: {
     flex: 1,
-    borderColor: '#6e1e96',
+    borderColor: Colors.primary,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 12,
-    marginTop: 8,
-    marginBottom: 16,
+    gap: Spacing.md,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   cancelButton: {
-    borderColor: '#cbd5e1',
+    borderColor: Colors.divider,
   },
   submitButton: {
-    backgroundColor: '#6e1e96',
   },
 });
 

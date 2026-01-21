@@ -1,31 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import { Text, FAB, Button } from 'react-native-paper';
+import { Text, Button } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { selectFilteredAndSortedTodos, selectLoading } from '../slices/todosSlice';
 import TodoItem from './TodoItem';
 import { Todo } from '../types';
+import { Colors, Spacing, FontSizes } from '../utils/constants';
 
 interface TodoListProps {
   onEditTodo: (todo: Todo) => void;
   onAddTodo: () => void;
   onFetchFromAPI?: () => void;
+  onDeleteTodo?: (todoId: string) => void;
 }
 
-const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromAPI }) => {
+const ITEMS_PER_PAGE = 10;
+
+const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromAPI, onDeleteTodo }) => {
   const todos = useSelector(selectFilteredAndSortedTodos);
   const loading = useSelector(selectLoading);
+  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
+
+  const displayedTodos = todos.slice(0, displayCount);
+  const hasMore = todos.length > displayCount;
+
+  // Reset pagination when todos list changes
+  useEffect(() => {
+    setDisplayCount(ITEMS_PER_PAGE);
+  }, [todos.length]);
+
+  const handleLoadMore = () => {
+    setDisplayCount(prev => Math.min(prev + ITEMS_PER_PAGE, todos.length));
+  };
 
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#6e1e96" />
+        <ActivityIndicator size="large" color={Colors.primary} />
         <Text style={styles.loadingText}>Loading todos...</Text>
       </View>
     );
   }
 
-  if (todos.length === 0) {
+  if (todos.length === 0 && !loading) {
     return (
       <View style={styles.centerContainer}>
         <Text variant="headlineSmall" style={styles.emptyTitle}>
@@ -41,7 +58,7 @@ const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromA
               onPress={onFetchFromAPI}
               icon="download"
               style={styles.fetchButton}
-              buttonColor="#6e1e96"
+              buttonColor={Colors.primary}
             >
               Fetch from API
             </Button>
@@ -52,7 +69,7 @@ const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromA
             icon="plus"
             style={styles.addButton}
           >
-            Add Todo
+            Add Task
           </Button>
         </View>
       </View>
@@ -62,20 +79,27 @@ const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromA
   return (
     <View style={styles.container}>
       <FlatList
-        data={todos}
+        data={displayedTodos}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TodoItem todo={item} onEdit={onEditTodo} />
+          <TodoItem todo={item} onEdit={onEditTodo} onDelete={onDeleteTodo} />
         )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-      />
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={onAddTodo}
-        label="Add"
-        color="#ffffff"
+        ListFooterComponent={
+          hasMore ? (
+            <View style={styles.loadMoreContainer}>
+              <Button
+                mode="outlined"
+                onPress={handleLoadMore}
+                style={styles.loadMoreButton}
+                textColor={Colors.primary}
+              >
+                Load More ({todos.length - displayCount} remaining)
+              </Button>
+            </View>
+          ) : null
+        }
       />
     </View>
   );
@@ -84,36 +108,37 @@ const TodoList: React.FC<TodoListProps> = ({ onEditTodo, onAddTodo, onFetchFromA
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: Colors.background,
   },
   listContent: {
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
-    backgroundColor: '#f8fafc',
+    padding: Spacing.xl,
+    backgroundColor: Colors.background,
   },
   loadingText: {
-    marginTop: 16,
-    color: '#64748b',
+    marginTop: Spacing.md,
+    color: Colors.textSecondary,
   },
   emptyTitle: {
-    color: '#1e293b',
-    marginBottom: 8,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
     fontWeight: '600',
   },
   emptyText: {
-    color: '#64748b',
+    color: Colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: Spacing.lg,
   },
   buttonContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 16,
+    gap: Spacing.md,
+    marginTop: Spacing.md,
   },
   fetchButton: {
     flex: 1,
@@ -121,12 +146,12 @@ const styles = StyleSheet.create({
   addButton: {
     flex: 1,
   },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#6e1e96',
+  loadMoreContainer: {
+    padding: Spacing.md,
+    alignItems: 'center',
+  },
+  loadMoreButton: {
+    borderColor: Colors.primary,
   },
 });
 

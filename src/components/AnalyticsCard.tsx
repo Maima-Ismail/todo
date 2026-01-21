@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Card } from 'react-native-paper';
-import { lightTheme } from '../utils/theme';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../utils/constants';
 
 interface AnalyticsCardProps {
   title: string;
@@ -15,7 +15,7 @@ const AnalyticsCard: React.FC<AnalyticsCardProps> = ({
   title,
   value,
   icon,
-  color = lightTheme.colors.primary,
+  color = Colors.primary,
 }) => {
   return (
     <Card style={styles.card} mode="elevated" elevation={2}>
@@ -35,37 +35,37 @@ const AnalyticsCard: React.FC<AnalyticsCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    marginHorizontal: 6,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
   },
   content: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
   },
   iconContainer: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: Colors.surfaceVariant,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginBottom: Spacing.sm,
   },
   textContainer: {
     flex: 1,
   },
   value: {
-    fontSize: 24,
+    fontSize: FontSizes.xxl,
     fontWeight: '700',
-    color: '#1e293b',
-    marginBottom: 4,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.xs,
+    textAlign: 'center',
   },
   title: {
-    fontSize: 14,
-    color: '#64748b',
+    fontSize: FontSizes.md,
+    color: Colors.textSecondary,
     fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: Spacing.md,
   },
 });
 

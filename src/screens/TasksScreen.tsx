@@ -1,17 +1,20 @@
-import React, { useState, useRef } from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import { Appbar, Button, Menu, Portal, Snackbar } from 'react-native-paper';
+import { Button, Portal, Snackbar, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { Colors, Spacing, ComponentSizes } from '../utils/constants';
 import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
 import ActiveFilters from '../components/ActiveFilters';
+import FilterSelectionSheet from '../components/FilterSelectionSheet';
 import FilterByDateSheet from '../components/FilterByDateSheet';
 import FilterByTimeSheet from '../components/FilterByTimeSheet';
 import SortBySheet from '../components/SortBySheet';
 import TodoList from '../components/TodoList';
 import TodoForm from '../components/TodoForm';
-import { fetchTodosFromAPI, addTodo, updateTodo, selectError, selectLoading, selectAllTodos } from '../slices/todosSlice';
+import { fetchTodosFromAPI, addTodo, updateTodo, deleteTodo, selectError, selectLoading, selectAllTodos } from '../slices/todosSlice';
 import { Todo } from '../types';
 
 const TasksScreen: React.FC = () => {
@@ -26,9 +29,11 @@ const TasksScreen: React.FC = () => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
+  const [filterSelectionSheetVisible, setFilterSelectionSheetVisible] = useState(false);
   const [filterDateSheetVisible, setFilterDateSheetVisible] = useState(false);
   const [filterTimeSheetVisible, setFilterTimeSheetVisible] = useState(false);
   const [sortSheetVisible, setSortSheetVisible] = useState(false);
+  const [deleteSnackbarVisible, setDeleteSnackbarVisible] = useState(false);
 
   const handleAddTodo = () => {
     setEditingTodo(null);
@@ -43,11 +48,25 @@ const TasksScreen: React.FC = () => {
   const handleSubmitTodo = (todoData: Omit<Todo, 'id' | 'createdAt'>) => {
     if (editingTodo) {
       dispatch(updateTodo({ ...todoData, id: editingTodo.id, createdAt: editingTodo.createdAt }));
+      setSnackbarMessage('Task updated successfully!');
+      setSnackbarType('success');
     } else {
       dispatch(addTodo(todoData));
+      setSnackbarMessage('Task added successfully!');
+      setSnackbarType('success');
     }
     setFormVisible(false);
     setEditingTodo(null);
+    setSnackbarVisible(true);
+  };
+
+  const handleDeleteTodo = (todoId: string) => {
+    dispatch(deleteTodo(todoId));
+    setDeleteSnackbarVisible(true);
+  };
+
+  const handleEditTodoFromList = (todo: Todo) => {
+    handleEditTodo(todo);
   };
 
   const handleFetchFromAPI = async () => {
@@ -81,70 +100,46 @@ const TasksScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <Header userName="User" />
-      <Appbar.Header style={styles.header} elevated>
-        <Appbar.Content title="Tasks" titleStyle={styles.title} />
-        <Menu
-          visible={menuVisible}
-          onDismiss={() => setMenuVisible(false)}
-          anchor={
-            <Appbar.Action
-              icon="dots-vertical"
-              onPress={() => setMenuVisible(true)}
-              color="#ffffff"
-            />
-          }
-        >
-          <Menu.Item
-            onPress={handleFetchFromAPI}
-            title="Fetch from API"
-            leadingIcon="download"
+      <View style={styles.content}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <SearchBar 
+            onFilterPress={() => {
+              // Open filter selection sheet first
+              setFilterSelectionSheetVisible(true);
+            }}
+            onSortPress={() => setSortSheetVisible(true)}
           />
-        </Menu>
-      </Appbar.Header>
+          <ActiveFilters />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <SearchBar 
-          onFilterPress={() => {
-            // Open date filter sheet
-            setFilterDateSheetVisible(true);
-          }}
-          onSortPress={() => setSortSheetVisible(true)}
-        />
-        <ActiveFilters />
-
-        {error && (
-          <View style={styles.errorContainer}>
+          <View style={styles.loadApiContainer}>
             <Button
-              mode="contained-tonal"
+              mode="contained"
               onPress={handleFetchFromAPI}
               loading={loading}
-              icon="refresh"
-              style={styles.retryButton}
+              icon="download"
             >
-              Retry Fetch from API
+              Load from API
             </Button>
           </View>
+
+          <TodoList 
+            onEditTodo={handleEditTodo} 
+            onAddTodo={handleAddTodo}
+            onFetchFromAPI={handleFetchFromAPI}
+            onDeleteTodo={handleDeleteTodo}
+          />
+        </ScrollView>
+
+        {allTodos.length > 0 && (
+          <FAB
+            icon="plus"
+            style={styles.fab}
+            onPress={handleAddTodo}
+            color={Colors.textOnPrimary}
+          />
         )}
-
-        <TodoList 
-          onEditTodo={handleEditTodo} 
-          onAddTodo={handleAddTodo}
-          onFetchFromAPI={handleFetchFromAPI}
-        />
-      </ScrollView>
-
-      <View style={styles.fabContainer}>
-        <Button
-          mode="contained"
-          onPress={handleAddTodo}
-          style={styles.fab}
-          contentStyle={styles.fabContent}
-          icon="plus"
-        >
-          Add Task
-        </Button>
       </View>
 
       <TodoForm
@@ -157,6 +152,16 @@ const TasksScreen: React.FC = () => {
         onSubmit={handleSubmitTodo}
       />
 
+      <FilterSelectionSheet
+        visible={filterSelectionSheetVisible}
+        onDismiss={() => setFilterSelectionSheetVisible(false)}
+        onSelectDate={() => {
+          setFilterDateSheetVisible(true);
+        }}
+        onSelectTime={() => {
+          setFilterTimeSheetVisible(true);
+        }}
+      />
       <FilterByDateSheet
         visible={filterDateSheetVisible}
         onDismiss={() => setFilterDateSheetVisible(false)}
@@ -191,6 +196,18 @@ const TasksScreen: React.FC = () => {
         >
           {snackbarMessage}
         </Snackbar>
+        <Snackbar
+          visible={deleteSnackbarVisible}
+          onDismiss={() => setDeleteSnackbarVisible(false)}
+          duration={3000}
+          style={styles.successSnackbar}
+          action={{
+            label: 'Dismiss',
+            onPress: () => setDeleteSnackbarVisible(false),
+          }}
+        >
+          Task deleted successfully
+        </Snackbar>
       </Portal>
     </SafeAreaView>
   );
@@ -199,51 +216,56 @@ const TasksScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: Colors.background,
+  },
+  content: {
+    flex: 1,
   },
   header: {
-    backgroundColor: '#6e1e96',
+    backgroundColor: Colors.primary,
   },
   title: {
     fontWeight: '700',
-    color: '#ffffff',
+    color: Colors.textOnPrimary,
   },
   scrollView: {
     flex: 1,
   },
+  loadApiContainer: {
+    padding: Spacing.md,
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
+  },
   errorContainer: {
-    padding: 16,
+    padding: Spacing.md,
     backgroundColor: '#fee2e2',
   },
   retryButton: {
-    marginTop: 8,
+    marginTop: Spacing.sm,
   },
   fabContainer: {
     position: 'absolute',
-    bottom: 80,
+    bottom: ComponentSizes.tabBarHeight,
     left: 0,
     right: 0,
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
   },
   fab: {
-    borderRadius: 12,
-    backgroundColor: '#6e1e96',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  fabContent: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    position: 'absolute',
+    margin: Spacing.md,
+    right: 0,
+    bottom: ComponentSizes.tabBarHeight,
+    backgroundColor: Colors.primary,
   },
   successSnackbar: {
-    backgroundColor: '#10b981',
+    backgroundColor: Colors.success,
   },
   errorSnackbar: {
-    backgroundColor: '#ef4444',
+    backgroundColor: Colors.error,
   },
 });
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { lightTheme } from '../utils/theme';
+import { Colors, Spacing, FontSizes } from '../utils/constants';
 
 interface HeaderProps {
   userName?: string;
@@ -14,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ userName = 'User' }) => {
         <MaterialCommunityIcons 
           name="hand-wave" 
           size={24} 
-          color={lightTheme.colors.primary} 
+          color={Colors.primary} 
           style={styles.icon}
         />
         <Text style={styles.greeting}>
@@ -27,26 +28,26 @@ const Header: React.FC<HeaderProps> = ({ userName = 'User' }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#ffffff',
+    paddingHorizontal: Spacing.md + 4,
+    paddingVertical: Spacing.md,
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: Colors.border,
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   icon: {
-    marginRight: 8,
+    marginRight: Spacing.sm,
   },
   greeting: {
-    fontSize: 20,
+    fontSize: FontSizes.xxl,
     fontWeight: '600',
-    color: '#1e293b',
+    color: Colors.textPrimary,
   },
   userName: {
-    color: lightTheme.colors.primary,
+    color: Colors.primary,
     fontWeight: '700',
   },
 });

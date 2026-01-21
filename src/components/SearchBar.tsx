@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Searchbar, IconButton } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { setNameFilter, selectFilter, selectSortOption } from '../slices/todosSlice';
+import { setNameFilter, selectFilter, selectSortOption, selectAllTodos } from '../slices/todosSlice';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../utils/constants';
 
 interface SearchBarProps {
   onFilterPress: () => void;
@@ -13,7 +14,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFilterPress, onSortPress }) => 
   const dispatch = useDispatch();
   const filter = useSelector(selectFilter);
   const sortOption = useSelector(selectSortOption);
+  const allTodos = useSelector(selectAllTodos);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const hasTodos = allTodos.length > 0;
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -38,28 +42,32 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFilterPress, onSortPress }) => 
           value={searchQuery}
           style={styles.searchbar}
           inputStyle={styles.searchInput}
-          iconColor="#6e1e96"
+          iconColor={Colors.primary}
           onClearIconPress={handleClear}
         />
         <View style={styles.actionButtons}>
           <IconButton
             icon="filter"
-            iconColor={hasActiveFilter ? '#6e1e96' : '#64748b'}
+            iconColor={hasActiveFilter ? Colors.primary : Colors.textSecondary}
             size={24}
             onPress={onFilterPress}
+            disabled={!hasTodos}
             style={[
               styles.actionButton,
               hasActiveFilter && styles.actionButtonActive,
+              !hasTodos && styles.actionButtonDisabled,
             ]}
           />
           <IconButton
             icon="sort"
-            iconColor={hasActiveSort ? '#6e1e96' : '#64748b'}
+            iconColor={hasActiveSort ? Colors.primary : Colors.textSecondary}
             size={24}
             onPress={onSortPress}
+            disabled={!hasTodos}
             style={[
               styles.actionButton,
               hasActiveSort && styles.actionButtonActive,
+              !hasTodos && styles.actionButtonDisabled,
             ]}
           />
         </View>
@@ -70,34 +78,37 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFilterPress, onSortPress }) => 
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#ffffff',
+    padding: Spacing.md,
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: Colors.border,
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
   },
   searchbar: {
     flex: 1,
     elevation: 0,
-    backgroundColor: '#f8fafc',
-    borderRadius: 12,
+    backgroundColor: Colors.background,
+    borderRadius: BorderRadius.lg,
   },
   searchInput: {
-    fontSize: 14,
+    fontSize: FontSizes.md,
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 4,
+    gap: Spacing.xs,
   },
   actionButton: {
     margin: 0,
   },
   actionButtonActive: {
-    backgroundColor: '#f3e8ff',
+    backgroundColor: Colors.chipBackground,
+  },
+  actionButtonDisabled: {
+    opacity: 0.4,
   },
 });
 

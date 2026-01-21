@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import HomeScreen from '../screens/HomeScreen';
 import TasksScreen from '../screens/TasksScreen';
 import { lightTheme } from '../utils/theme';
+import { Colors, Spacing, ComponentSizes } from '../utils/constants';
 
 const Tab = createBottomTabNavigator();
 
@@ -11,16 +12,16 @@ const BottomTabNavigator: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: lightTheme.colors.primary,
-        tabBarInactiveTintColor: '#94a3b8',
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textTertiary,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: Colors.surface,
           borderTopWidth: 1,
-          borderTopColor: '#e2e8f0',
-          height: 80,
-          paddingBottom: 12,
-          paddingTop: 8,
-          paddingHorizontal: 8,
+          borderTopColor: Colors.border,
+          height: ComponentSizes.tabBarHeight,
+          paddingBottom: Spacing.md,
+          paddingTop: Spacing.sm,
+          paddingHorizontal: Spacing.sm,
         },
         headerShown: false,
       }}

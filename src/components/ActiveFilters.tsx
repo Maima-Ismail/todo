@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Chip, Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearFilter, setSortOption, setDateTimeFilter, selectFilter, selectSortOption } from '../slices/todosSlice';
+import { Colors, Spacing, FontSizes } from '../utils/constants';
 
 const ActiveFilters: React.FC = () => {
   const dispatch = useDispatch();
@@ -30,10 +31,10 @@ const ActiveFilters: React.FC = () => {
 
   const getFilterLabel = () => {
     if (filter.dateTimeFilter) {
-      if (filter.dateTimeFilter.type === 'date' && filter.dateTimeFilter.value.includes(' to ')) {
-        return `Date: ${filter.dateTimeFilter.value}`;
-      }
-      return `${filter.dateTimeFilter.type}: ${filter.dateTimeFilter.value}`;
+      const value = filter.dateTimeFilter.value;
+      // Handle old range format for backward compatibility
+      const displayValue = value.includes(' to ') ? value.split(' to ')[0] : value;
+      return `${filter.dateTimeFilter.type}: ${displayValue}`;
     }
     return `${filter.type}: ${filter.value}`;
   };
@@ -79,29 +80,29 @@ const ActiveFilters: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#ffffff',
+    padding: Spacing.md,
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: Colors.border,
   },
   section: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   sectionTitle: {
-    marginRight: 8,
-    color: '#64748b',
+    marginRight: Spacing.sm,
+    color: Colors.textSecondary,
     fontWeight: '600',
   },
   chip: {
-    backgroundColor: '#f3e8ff',
-    borderColor: '#6e1e96',
+    backgroundColor: Colors.chipBackground,
+    borderColor: Colors.chipBorder,
     borderWidth: 1,
   },
   chipText: {
-    color: '#6e1e96',
-    fontSize: 12,
+    color: Colors.chipText,
+    fontSize: FontSizes.sm,
   },
 });
 

@@ -67,7 +67,8 @@ const todosSlice = createSlice({
         id: `todo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString(),
       };
-      state.todos.push(newTodo);
+      // Add new todos at the top
+      state.todos.unshift(newTodo);
     },
     updateTodo: (state, action: PayloadAction<Todo>) => {
       const index = state.todos.findIndex(todo => todo.id === action.payload.id);
@@ -196,11 +197,7 @@ export const selectFilteredAndSortedTodos = (state: { todos: TodosState }): Todo
     filteredTodos = filteredTodos.filter(todo => {
       switch (dateTimeFilter.type) {
         case 'date':
-          // Handle date range (format: "YYYY-MM-DD to YYYY-MM-DD") or single date
-          if (dateTimeFilter.value.includes(' to ')) {
-            const [startDate, endDate] = dateTimeFilter.value.split(' to ');
-            return todo.dueDate >= startDate && todo.dueDate <= endDate;
-          }
+          // Single date filter
           return todo.dueDate === dateTimeFilter.value;
         case 'time':
           return todo.dueTime.includes(dateTimeFilter.value);
